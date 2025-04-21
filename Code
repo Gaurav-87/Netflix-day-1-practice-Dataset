@@ -1,0 +1,28 @@
+from google.colab import files
+uploaded = files.upload()  
+
+import pandas as pd
+df = pd.read_csv('netflix_titles.csv')
+print(df.head())
+
+print(df.isnull().sum())
+print(df[df.isnull().any(axis=1)])
+df['director'].fillna('Unknown', inplace=True)
+df.dropna(subset=['title'], inplace=True)
+
+print("Duplicates:", df.duplicated().sum())
+df.drop_duplicates(inplace=True)
+
+df['country'] = df['country'].str.strip().str.title()
+
+df['date_added'] = pd.to_datetime(df['date_added'], errors='coerce')
+
+df.columns = df.columns.str.strip().str.lower().str.replace(' ', '_')
+
+print(df.dtypes)
+df['release_year'] = df['release_year'].astype('int')
+df['date_added'] = pd.to_datetime(df['date_added'], errors='coerce')
+
+df.to_csv('cleaned_netflix_titles.csv', index=False)
+
+files.download('cleaned_netflix_titles.csv')
